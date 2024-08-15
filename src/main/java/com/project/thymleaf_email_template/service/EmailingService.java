@@ -3,9 +3,9 @@ package com.project.thymleaf_email_template.service;
 import com.project.thymleaf_email_template.dto.MailRequest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -25,9 +25,7 @@ public class EmailingService {
     @Async
     public void sendMail(MailRequest request) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
-
-        System.out.println();
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
 
         mimeMessageHelper.setFrom(fromMail);
         mimeMessageHelper.setTo(request.getToEmail());
@@ -35,17 +33,14 @@ public class EmailingService {
 
         if (request.isHTML()) {
             Context context = new Context();
-
-            /*
-            content is the variable defined in our HTML template within the div tag
-            */
-
-            context.setVariable("content", request.getMessage());
+            context.setVariable("user", request.getUser());
             String processedString = templateEngine.process("template", context);
+            mimeMessageHelper.setText(processedString,true);
 
-            mimeMessageHelper.setText(processedString, true);
+            ClassPathResource logo = new ClassPathResource("static/images/logo.jpg");
+            mimeMessageHelper.addInline("logoCid", logo);
         } else {
-            mimeMessageHelper.setText(request.getMessage(), false);
+            mimeMessageHelper.setText("No name", false);
         }
         mailSender.send(mimeMessage);
     }

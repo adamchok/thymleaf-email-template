@@ -5,10 +5,12 @@
         <title>Testing Email</title>
     </head>
     <body>
-        <!--
-        HTML code would be added to the below div tag
-        which would be taken as an input from the user.
-        -->
-        <div th:utext="${content}"></div>
+        <h1>Welcome, <span th:text="${user.name}">User</span>!</h1>
+        <p>
+            hank you for joining us, <span th:text="${user.name}">User</span>.<br>
+            We are excited to have you on board.
+        </p>
+        <!-- Referencing the image using CID -->
+        <img th:src="@{'cid:logoCid'}" alt="Company Logo" />
     </body>
 </html>
